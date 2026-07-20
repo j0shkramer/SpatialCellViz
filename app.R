@@ -230,7 +230,9 @@ server <- function(input, output, session) {
         hover = "hover_val",
         popup.vars = TRUE,
         popup.format = tm_label_format(digits = 3) # round all numeric data to the third decimal place
-      )
+      ) +
+      tm_title(text = paste("Cell Mask Colored By", gsub("_", " ", curr_plotting)),
+               position = tm_pos_out())
   })
 }
 
