@@ -83,9 +83,6 @@ ui = fluidPage(
 
 server <- function(input, output, session) {
 
-  options("shinymanager.pwd_failure_limit" = 5) # allows larger file size import
-  options(shiny.maxRequestSize = 100*1024^2) # allows larger file size import - do not adjust
-
   # Set TMAP mode to view
   tmap_mode("view")
 
