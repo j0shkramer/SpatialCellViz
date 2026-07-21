@@ -53,8 +53,13 @@ ui = fluidPage(
         z-index: 999;              /* Ensures it stays on top of scrollable content */
         }
         .shiny-input-container {
-        color: #474747;
-        }"))
+        color: #2e2d2d;
+        }
+        .shiny-output-error {
+        color: red;
+        font-weight: bold;
+      }
+    "))
     ),
   
   ## Application title ----
@@ -69,19 +74,32 @@ ui = fluidPage(
            ## input file -----
           fileInput("files", "Upload single cell .csv file and corresponding .tiff file",
                     multiple = TRUE, accept = c(".csv", ".tiff")),
+
+          # Select what variable to plot the tmap obkect as 
           uiOutput("plotBy"),
+
+          # Select the x axis variable for the plot within sidebar
           uiOutput("selectXAxis"),
+
+          # Select the y axis variable for the plot within sidebar
           uiOutput("selectYAxis"),
+
+          # Subset plot within sidebar by phenotype if desired
           uiOutput("subsetPhenotype"),
+
+          # Sidebar biaxial plot
           plotOutput("ggplot")
         ),
     mainPanel(
+      # TMAP plot
       tmapOutput("tmap_plot", width = "1000px", height = "800px")
     )
   )
 )
 
 server <- function(input, output, session) {
+
+  options(shiny.maxRequestSize = 1000*1024^2) # Maximum file upload size is 1 GB
 
   # Set TMAP mode to view
   tmap_mode("view")
@@ -119,17 +137,29 @@ server <- function(input, output, session) {
     cell_mask_sf   <- st_as_sf(cell_mask_vect) 
     col_list <- colnames(cell_mask_sf)
     cell_mask_sf <- cell_mask_sf |>
-              rename(cell_label = !!col_list[1]) 
-    # |>
-    #           filter(cell_label != 0)
+              rename(cell_label = !!col_list[1]) |>
+              filter(cell_label != 0)
   })
 
   # Reactive that combines CSV and SF object for plotting
   combined_data <- reactive({
     req(sf_data(), csv_data())
-    full_join(sf_data(), csv_data(), by = "cell_label")
+    joined <- full_join(sf_data(), csv_data(), by = "cell_label")
+
+    # check if there is a mismatch between the cell labels within the csv and tiff files
+    has_missing_pheno_geo <- joined %>%
+      pull(phenotype, geometry) %>%
+      is.na() %>%
+      any()
+
+    # display error message if there is a mismatch and don't allow plotting to occur
+    validate(
+      need(!has_missing_pheno_geo, "Some cells are missing a phenotypic assignment or cell area. Check if you selected the correct single cell .csv and its corresponding .tiff files")
+    )
+    joined
   })
 
+  # Set what to plot the TMAP plot by - ignoring certain usual outputs from MIBICluster Nextflow pipeline
   output$plotBy <- renderUI({
     req(sf_data())
     selectInput("plot_by",
@@ -144,6 +174,7 @@ server <- function(input, output, session) {
                 selected = "phenotype")
   })
 
+  # Set x axis for sidebar biaxial - ignoring certain usual outputs from MIBICluster Nextflow pipeline that would not be numeric
   output$selectXAxis <- renderUI({
     req(csv_data())
     selectInput("x_axis",
@@ -159,6 +190,8 @@ server <- function(input, output, session) {
       )
   })
 
+
+  # Set y axis for sidebar biaxial - ignoring certain usual outputs from MIBICluster Nextflow pipeline that would not be numeric
   output$selectYAxis <- renderUI({
     req(csv_data())
     selectInput("y_axis",
@@ -174,6 +207,8 @@ server <- function(input, output, session) {
       )
   })
 
+
+  # Allow user to subset sidebar plot by phenotype if they desire
   output$subsetPhenotype <- renderUI({
     req(csv_data())
     selectInput("subset_phenotype",
@@ -185,7 +220,7 @@ server <- function(input, output, session) {
 
   # Output ggplot
   output$ggplot <- renderPlot({
-    req(csv_data(), input$x_axis, input$y_axis, input$subset_phenotype)
+    req(csv_data(), combined_data(), input$x_axis, input$y_axis, input$subset_phenotype)
 
     if (input$subset_phenotype != "All") {
       csv_to_plot_data = csv_data() |> filter(phenotype == input$subset_phenotype)
@@ -228,8 +263,9 @@ server <- function(input, output, session) {
         popup.vars = TRUE,
         popup.format = tm_label_format(digits = 3) # round all numeric data to the third decimal place
       ) +
-      tm_title(text = paste("Cell Mask Colored By", gsub("_", " ", curr_plotting)),
-               position = tm_pos_out())
+      tm_title(text = paste("Cell Mask Colored By", curr_plotting),
+                position = tm_pos_out()
+      )
   })
 }
 
