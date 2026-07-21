@@ -10,22 +10,18 @@ SpatialCellViz makes it easy to explore spatial single-cell data across an ROI (
 - Visualize spatial single-cell data for a single ROI
 - Visualize cell masks
 - Overlay cell phenotype, biomarker expression, or cellular neighborhoods on spatial plots
-- Explore biaxial plots of biomarkers
+- Explore biaxial plots of biomarkers and subset by phenotype
 
 ## Inputs
 
-SpatialCellViz accepts a CSV file containing single-cell data and its corresponding `.tiff` file (upload limit: **100 MB**)
+SpatialCellViz accepts a CSV file containing single-cell data and its corresponding `.tiff` file (upload limit: **1 G**)
 
 ### Required Columns
 
 | Column          | Required? | Description                                                            |
 |-----------------|-----------|------------------------------------------------------------------------|
 | `phenotype`     | Yes       | Cell Phenotype                                                         |
-| `cell_label`    | Yes       | Unique identifier for each cell that matches that cell in `.tiff` file |
-| `cell_area`     | Yes       | Cell Area                                                              |
-| `centroid_X_um` | Yes       | X coordinate for plotting                                              |
-| `centroid_Y_um` | Yes       | Y coordinate for plotting                                              |
-| `neigh_kmeans`  | Optional  | Cellular Spatial Neighborhood                                          |
+| `cell_label`    | Yes       | Unique identifier for each cell that matches its corresponding cell in `.tiff` file |
 
 ## Running Locally
 
@@ -49,7 +45,7 @@ Install the required packages in R:
 ```
 install.packages(c(
     "shiny", "shinymanager", "sf", "terra", "tidyverse", "data.table",
-    "tmap", "plotly", "leaflet", "Polychrome", "pals", "tools"
+    "tmap", "plotly", "leaflet", "Polychrome", "pals"
 ))
 ```
 
