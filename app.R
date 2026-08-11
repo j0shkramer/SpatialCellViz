@@ -250,7 +250,8 @@ server <- function(input, output, session) {
         curr_palette = "magma"
         plot_data$hover_val <- round(plot_data[[curr_plotting]], 3)
     } else {
-        curr_palette = "brewer.set3"
+        n_cats <- length(unique([[cutt_plotting]]))
+        curr_palette <- pals::glasbey(n_cats)
         plot_data$hover_val <- plot_data[[curr_plotting]]
     } 
       
