@@ -67,7 +67,7 @@ ui = fluidPage(
 
   h3("Interactive spatial single-cell visualization"),
 
-  h5("Josh Kramer - Last Updated: July 2026"),
+  h5("Josh Kramer - Last Updated: August 2026"),
 
   sidebarLayout(
         sidebarPanel(

@@ -4,7 +4,7 @@
 
 SpatialCellViz makes it easy to explore spatial single-cell data across an ROI (region of interest)
 
-![example](images/example.png)
+![example](images/spatialcellviz.png)
 
 ## Features
 - Visualize spatial single-cell data for a single ROI
