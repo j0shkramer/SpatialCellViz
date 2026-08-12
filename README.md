@@ -23,6 +23,34 @@ SpatialCellViz accepts a CSV file containing single-cell data and its correspond
 | `phenotype`     | Yes       | Cell Phenotype                                                         |
 | `cell_label`    | Yes       | Unique identifier for each cell that matches its corresponding cell in `.tiff` file |
 
+## Running With Docker
+
+If you have Docker installed
+
+### 1. Clone the repository
+
+```
+git clone https://github.com/j0shkramer-op/SpatialCellViz.git
+```
+
+### 2. Navigate to repository
+
+```
+cd SpatialCellViz
+```
+
+### 3. Docker Build Command
+
+```
+docker build -t spatialcellviz .
+```
+
+### 4. Docker Run Command
+
+```
+docker run -d -p 3838:3838 --name SpatialCellViz_Container spatialcellviz
+```
+
 ## Running Locally
 
 ### Requirements
@@ -40,6 +68,7 @@ SpatialCellViz accepts a CSV file containing single-cell data and its correspond
     - `Polychrome`
     - `pals`
     - `tools`
+
 
 Install the required packages in R:
 ```

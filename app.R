@@ -250,10 +250,10 @@ server <- function(input, output, session) {
         curr_palette = "magma"
         plot_data$hover_val <- round(plot_data[[curr_plotting]], 3)
     } else {
-        n_cats <- length(unique([[cutt_plotting]]))
+        n_cats <- length(unique(combined_data()[[curr_plotting]]))
         curr_palette <- pals::glasbey(n_cats)
         plot_data$hover_val <- plot_data[[curr_plotting]]
-    } 
+    }
       
       
     tm_shape(plot_data) +
